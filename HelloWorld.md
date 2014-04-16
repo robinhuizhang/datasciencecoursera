@@ -5,4 +5,4 @@
 \deftab720
 \pard\pardeftab720
 
-\f0\fs24 \cf0 ## This is a markdown file again}
+\f0\fs24 \cf0 ## This is a markdown file}
