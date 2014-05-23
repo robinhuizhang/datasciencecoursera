@@ -1,0 +1,46 @@
+library("swirl")
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
+getwd()
+download.file(fileUrl,destfile="./Documents/datasciencecoursera/week1quiz.csv",method="curl")
+list.files("./Documents/datasciencecoursera")
+dateDownloaded <- date()
+dataeDownloaded
+dateDownloaded
+setwd("./Documents/datasciencecoursera")
+getwd()
+library(xlsx)
+data3 <- read.xlsx("./data3.xlsx",sheetIndex=1,header=True)
+data3 <- read.xlsx("./data3.xlsx",sheetIndex=1,header=TRUE)
+head(data3)
+colIndex <- 7:15
+rowIndex <- 18:23
+dat <- read.xlsx("./data3.xlsx",sheetIndex=1,colIndex=colIndex, rowIndex=rowIndex)
+sum(dat$Zip*dat$Ext,na.rm=T)
+library(XML)
+install.packages()
+library(XML)
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+doc <- xmlTreeParse(fileUrl, useInternal=TRUE)
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+doc <- xmlTreeParse(fileUrl, useInternal=TRUE)
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+doc <- xmlTreeParse(fileUrl, useInternal=TRUE)
+rootNode <- xmlRoot(doc)
+fileUrl <- "http://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml"
+doc <- xmlTreeParse(fileUrl, useInternal=TRUE)
+rootNode <- xmlRoot(doc)
+xmlName(rootNode)
+f = xmlToDataFrame(nodes=xmlChildren(xmlRoot(doc)[["zipcode"]]))
+f = xmlToDataFrame(nodes=xmlChildren(xmlRoot(doc)[["zipcode"]])
+addNames = TRUE
+f = xmlToDataFrame(nodes=xmlChildren(xmlRoot(doc)[["zipcode"]]))
+zipcode <- xpathSApply(rootNode, "//zipcode", xmlValue)
+zipcode
+table(zipcode == 21231)
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv"
+download.file(fileUrl, destfile="./data5.csv", method="curl")
+install.packages()
+library(data.table)
+DT <- fread("data5.csv")
+tables()
+system.time(rowMeans(DT)[DT$SEX==1]; rowMeans(DT)[DT$SEX==2])

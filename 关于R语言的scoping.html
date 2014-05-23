@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html class="ua-mac ua-ff29" lang="zh-CN"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="renderer" content="webkit">
+
+    <title>
+    关于R语言的scoping
+</title>
+    
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="Sun, 6 Mar 2005 01:00:00 GMT">
+    
+    <link href="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/dialog.css" rel="stylesheet" type="text/css"><script async="true" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/ad.js" type="text/javascript"></script><script async="true" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/dialog.js" type="text/javascript"></script><script>var _head_start = new Date();</script>
+    <script src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/jquery.js"></script>
+    <script src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/douban.js"></script>
+    <link href="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/douban.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    
+        
+    .ui-tooltip { width: 270px }
+    .note-header h1 { margin:00;padding:0; font: 14px Arial, Helvetica, sans-serif; line-height: 150%; color: #060;  }
+    .note img { max-width:590px; }
+    .tabs{font-size:0;letter-spacing:-0.31em;*letter-spacing:normal;word-spacing:-0.43em}.tabs a{display:inline-block;*display:inline;zoom:1;padding:1px 8px;margin-right:5px}.tabs a:link,.tabs a:visited,.tabs a:hover,.tabs a:active{font-size:12px;line-height:1.2;letter-spacing:normal;word-spacing:normal}.tabs a:hover,.tabs a:active{-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}.tabs a.on:link,.tabs a.on:visited,.tabs a.on:hover,.tabs a.on:active{color:#fff;background:#83bf73;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}.tabs{margin:40px 0 10px;padding-bottom:8px;border-bottom:1px solid #e6e6e6}.list,.list .content{overflow:hidden;zoom:1}.list .pic{float:left;margin-right:12px}.list p{margin:8px 0 0 0;background:#f9f9f9;padding:8px}.list .pubtime{position:absolute;top:10px;right:0;color:#999}.list .pic img{width:24px;height:24px}.list ul{margin-top:-15px}.list li{position:relative;padding-top:10px;margin-top:10px;border-top:1px dashed #e6e6e6;overflow:hidden;color:#666}.topic-fav-list .content{margin-top:4px;width:70%}.topic-fav-list .pubtime{top:14px}.topic-rec-list .pubtime a:link,.topic-rec-list .pubtime a:visited{color:#666}.topic-rec-list .pubtime a:hover,.topic-rec-list .pubtime a:active{color:#fff}.topic-rec-list p{padding:0}.topic-rec-list p a{display:block;background:#f9f9f9;padding:8px}.topic-rec-list p a:link,.topic-rec-list p a:visited{color:#666}.topic-rec-list p a:hover,.topic-rec-list p a:active{background-color:#f6f6f6;color:#666}
+
+    </style>
+    
+    <meta http-equiv="mobile-agent" content="format=xhtml; url=http://m.douban.com/note/269216547/">
+    <link type="text/css" href="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/jquery.css" rel="stylesheet">
+    <link type="text/css" href="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/tag.css" rel="stylesheet">
+    <script type="text/javascript" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/do.js" data-cfg-autoload="false"></script>
+    <script type="text/javascript" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/jquery_002.js"></script>
+    <script type="text/javascript" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/jquery_003.js"></script>
+
+    <link rel="stylesheet" href="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/4f10621072e9b2de.css">
+    <script></script>
+
+    <link rel="shortcut icon" href="http://img3.douban.com/favicon.ico" type="image/x-icon">
+<style id="css-share-button" type="text/css">      .bn-sharing {padding-right:10px;background-image: url(http://t.douban.com/pics/a1.png) !important; background-repeat: no-repeat !important; background-position: 100% -19px !important;*display:inline-block;}      a.bn-sharing:hover {text-decoration:underline;}      .bn-sharing-on {background-position:100% 4px !important;position:relative !important;z-index:1 !important;}      #db-div-sharing {position:absolute;width:100px;*margin-top:-2px;}      #db-div-sharing .bd {border:1px solid #aaa;background:#fff;padding:10px 0 0 10px;}      #db-div-sharing .bd li {line-height:17px;margin-bottom:10px;}      #db-div-sharing .hd {position:absolute;height:24px;*line-height:21px;overflow:hidden;right:0;top:-24px;padding:0 5px;border:1px solid #aaa;border-bottom:none;background:#fff;}      .rec-sin,      .rec-qzone,      .rec-tx,      .rec-wx,      .rec-qqim {padding-left:20px;background:url(http://img3.douban.com/f/shire/d15ffd71f3f10a7210448fec5a68eaec66e7f7d0/pics/ic_shares.png) no-repeat 0 0;}      .rec-qzone {background-position:0 -32px;}      .rec-qqim {background-position:0 -64px;}      .rec-tx {background-position:0 -96px;}      .rec-wx {background-position:0 -128px;}   </style><script async="true" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/ga.js"></script></head>
+
+<body><div style="margin-top: 0px; display: none;" class="ui-overlay-anchor"></div>
+  
+    <script type="text/javascript">var _body_start = new Date();</script>
+    
+   
+
+
+
+
+
+
+
+<div id="db-global-nav" class="global-nav">
+  <div class="bd">
+    
+
+
+
+
+
+
+<div class="top-nav-info">
+      
+      <a href="http://www.douban.com/accounts/login?source=main" class="nav-login" rel="nofollow">登录</a>
+      <a href="http://www.douban.com/accounts/register?source=main" class="nav-register" rel="nofollow">注册</a>
+</div>
+
+
+
+    <div class="global-nav-items">
+      <ul>
+          
+            
+            <li class="on">
+            <a href="http://www.douban.com/" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-main&quot;,&quot;uid&quot;:&quot;0&quot;}">豆瓣</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://book.douban.com/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-book&quot;,&quot;uid&quot;:&quot;0&quot;}">读书</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://movie.douban.com/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-movie&quot;,&quot;uid&quot;:&quot;0&quot;}">电影</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://music.douban.com/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-music&quot;,&quot;uid&quot;:&quot;0&quot;}">音乐</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://www.douban.com/location/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-location&quot;,&quot;uid&quot;:&quot;0&quot;}">同城</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://www.douban.com/group/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-group&quot;,&quot;uid&quot;:&quot;0&quot;}">小组</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://read.douban.com/?dcs=top-nav&amp;dcm=douban" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-read&quot;,&quot;uid&quot;:&quot;0&quot;}">阅读</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://douban.fm/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-fm&quot;,&quot;uid&quot;:&quot;0&quot;}">豆瓣FM</a>
+            </li>
+          
+            
+            <li>
+            <a href="http://dongxi.douban.com/?dcs=top-nav&amp;dcm=douban" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-commodity&quot;,&quot;uid&quot;:&quot;0&quot;}">东西</a>
+            </li>
+          
+            <li>
+              <a href="#more" class="bn-more"><span>更多</span></a>
+              <div class="more-items">
+                <table cellpadding="0" cellspacing="0">
+                    
+                    <tbody><tr><td><a href="http://9.douban.com/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-9&quot;,&quot;uid&quot;:&quot;0&quot;}">九点</a></td></tr>
+                    
+                    <tr><td><a href="http://alphatown.com/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-town&quot;,&quot;uid&quot;:&quot;0&quot;}">阿尔法城</a></td></tr>
+                    
+                    <tr><td><a href="http://www.douban.com/mobile/" target="_blank" data-moreurl-dict="{&quot;from&quot;:&quot;top-nav-click-mobile&quot;,&quot;uid&quot;:&quot;0&quot;}">移动应用</a></td></tr>
+                </tbody></table>
+              </div>
+            </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+   
+    
+
+
+
+
+
+
+
+<div id="db-nav-sns" class="nav">
+  <div class="nav-wrap">
+    <div class="nav-primary">
+      <div class="nav-search">
+        <form action="http://www.douban.com/search" method="get">
+          <fieldset>
+            <legend>搜索：</legend>
+            <label style="display: none;" for="inp-query">搜索你感兴趣的内容和人...</label>
+            <div class="inp">
+              <input name="source" value="suggest" type="hidden">
+              <input placeholder="搜索你感兴趣的内容和人..." id="inp-query" name="q" size="22" title="搜索搜索你感兴趣的内容和人..." maxlength="60" autocomplete="off">
+            </div>
+            <div class="inp-btn"><input value="搜索" type="submit"></div>
+          </fieldset>
+        </form>
+      </div>
+  
+      <div class="nav-logo">
+        <a href="http://www.douban.com/">豆瓣社区</a>
+      </div>
+  
+      <div class="nav-items">
+        <ul>
+          <li><a href="http://www.douban.com/">首页</a></li>
+          <li><a href="http://www.douban.com/explore/">浏览发现</a></li>
+          <li>
+              <a href="http://www.douban.com/thing/explore">事情</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+    <div id="wrapper">
+        
+
+        
+<div id="content">
+    
+
+    <div class="grid-16-8 clearfix">
+        
+        
+        <div class="article">
+               
+    
+    
+    
+    <div id="reg-up">
+        <a href="http://www.douban.com/accounts/register" data-source="note" data-key="regpop" data-cookie="1" data-expired="3600000" data-width="400" data-height="300" class="btn-reg lnk-show-reg">快速注册</a>
+    </div>
+    
+
+        
+
+
+<div id="db-usr-profile">
+<div class="pic">
+    <a href="http://www.douban.com/people/C6H5NO2/">
+        <img src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/u3796992-8.jpg" alt="C6H5NO2" height="48" width="48">
+    </a>
+</div>
+<div class="info">
+        <h1>C6H5NO2的日记</h1>
+        
+    <ul>
+          <li><a href="http://www.douban.com/people/C6H5NO2/">C6H5NO2的主页</a></li>
+          <li><a href="http://www.douban.com/people/C6H5NO2/statuses">广播</a></li>
+          <li><a href="http://www.douban.com/people/C6H5NO2/photos">相册</a></li>
+          <li><a href="http://www.douban.com/people/C6H5NO2/notes">日记</a></li>
+          <li><a href="http://www.douban.com/people/C6H5NO2/likes/">喜欢</a></li>
+          <li><a href="http://www.douban.com/people/C6H5NO2/doulists">豆列</a></li>
+    </ul>
+
+</div>
+</div>
+    <div class="clear"></div>
+
+    
+    
+
+    <div id="note-269216547">
+
+    
+    
+        <div class="note-header">
+        <h1>关于R语言的scoping</h1>
+
+    
+    <div>
+        <span class="pl">2013-03-31 12:07:24</span>
+    </div>
+    </div>
+        <div class="clear"></div>
+
+
+    <div class="note" id="note_269216547_short" style="display:none;"></div><div id="note_269216547_full"><div class="note" id="link-report">近日诸多友邻推荐了<a rel="nofollow" href="http://blog.sina.com.cn/s/blog_5d90e82f0101jo6r.html" target="_blank">Lisp 已死，Lisp 万岁！</a>，看过之后调查了一下R的scoping方式。<br><br>R用的是lexical scope，有别于S-Plus的static scope和Lisp的dynamic scope。<br>首先来看一个<a rel="nofollow" href="http://cran.r-project.org/doc/manuals/R-intro.html#Scope" target="_blank">An Introduction to R</a>里的例子：<br>#1#################<br>n &lt;- 3<br>cube &lt;- function(n) {<br>&nbsp;&nbsp;sq &lt;- function() n*n<br>&nbsp;&nbsp;n*sq()<br>}<br>cube(2)<br>#######################<br>这里不给答案，有兴趣的友邻可以先想想，再到R里尝试一下看想的对不对。<br><br>接下来的例子来自一篇<a rel="nofollow" href="http://lingpipe-blog.com/2010/09/09/rs-dynamic-scoping/" target="_blank">博文</a>。<br>#2####################<br>b=3<br>f = function () { <br>&nbsp;&nbsp;g = function () a+b<br>&nbsp;&nbsp;a = 10<br>&nbsp;&nbsp;g()<br>}<br>h = function () { <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a = 100<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b = 200<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f()<br>}<br>h()<br>#######################<br>还是想想，再到R里试一下。<br><br>如果觉得结果奇怪的话，再看下面这个例子<br>#3####################<br>h = function () {<br>&nbsp;&nbsp;f = function () {<br>&nbsp;&nbsp;&nbsp;&nbsp;g = function () a+b<br>&nbsp;&nbsp;&nbsp;&nbsp;a = 10<br>&nbsp;&nbsp;&nbsp;&nbsp;g()<br>&nbsp;&nbsp;}<br>&nbsp;&nbsp;a = 100<br>&nbsp;&nbsp;b = 200<br>&nbsp;&nbsp;f()<br>}<br>b=3<br>h()<br>######################<br>这个答案是不是更好懂呢？<br><br>下面这段代码的结果应该比较好理解。<br>#4####################<br>x &lt;- "a"<br>f =function() {<br>&nbsp;&nbsp;if (runif(1) &gt; .5) x = 10<br>&nbsp;&nbsp;x<br>}<br>for(i in 1:20) print(f())<br>######################<br><br>如果有一天，R程序员成为一个热门职位的话，这种题会被用来当作笔试题目吧，就像其他语言的一些笔试题那样。<br>其实很讨厌这种题啊……比起能答对这种题，养成好的编程习惯更重要。</div></div>
+
+    <br>
+
+        
+    
+
+    <div id="sep"></div>
+    <div id="note_269216547_footer" class="note-ft">
+        <div class="note_upper_footer">
+          
+
+
+
+
+
+
+
+
+          <span class="gtleft">
+              &nbsp;&nbsp;
+          </span>
+
+          
+
+
+
+
+
+        </div>
+
+
+        
+        <div class="sns-bar">
+
+            
+
+
+
+            <div class="sns-bar-rec">
+                    
+                    <script>
+                    DoubanShareMenuList = [ 'sina', 'qzone', 'tx', 'renren', 'qqim' ];
+                    </script>
+                    
+    
+    <span class="rec" id="Note-269216547">
+        <a href="#" data-type="Note" data-url="http://www.douban.com/note/269216547/" data-desc="" data-title="【关于R语言的scoping】近日诸多友邻推荐了Lisp 已死，Lisp 万岁！，看过之后调查了一下R的scoping方式。 R用的是lexical scope，有别于S-Plus的static scope和Lisp的dynamic scope。 首先来看一个An Introduction to R里的例子： #1###..." data-pic="" class="bn-sharing ">分享到</a> &nbsp;&nbsp;
+    </span>
+    <script>
+    if (!window.DoubanShareMenuList) {
+        window.DoubanShareMenuList = [];
+    }
+    var __cache_url = __cache_url || {};
+    (function(u){
+        if(__cache_url[u]) return;
+        __cache_url[u] = true;
+        window.DoubanShareIcons = 'http://img3.douban.com/f/shire/d15ffd71f3f10a7210448fec5a68eaec66e7f7d0/pics/ic_shares.png';
+        var initShareButton = function() {
+          $.ajax({url:u,dataType:'script',cache:true});
+        };
+        if (typeof Do == 'function' && 'ready' in Do) {
+          Do('http://img3.douban.com/f/shire/ae32cb8310a09ba836b958b79d2cd1e706db2fed/css/ui/dialog.css',
+            'http://img3.douban.com/f/shire/4b3bad5e25de78678d700dd5353570dce3e6bbcc/js/ui/dialog.js',
+            initShareButton);
+        } else if(typeof Douban == 'object' && 'loader' in Douban) {
+          Douban.loader.batch(
+            'http://img3.douban.com/f/shire/ae32cb8310a09ba836b958b79d2cd1e706db2fed/css/ui/dialog.css',
+            'http://img3.douban.com/f/shire/4b3bad5e25de78678d700dd5353570dce3e6bbcc/js/ui/dialog.js'
+          ).done(initShareButton);
+        }
+    })('http://img3.douban.com/f/shire/29d220c1b2ce66f0971d871ef37a76baa3ea9201/js/lib/sharebutton.js');
+    </script>
+
+                    
+                    
+
+
+
+
+
+
+
+
+    <div class="rec-sec">
+
+    <span class="rec">
+
+<a data-user_id="0" href="https://www.douban.com/accounts/register?reason=collect" share-id="269216547" data-mode="plain" data-name="关于R语言的scoping" data-type="com.douban.people" data-desc="近日诸多友邻推荐了Lisp 已死，Lisp 万岁！，看过之后调查了一下R的scoping方式。 R用的是lexical scope，有别于S-Plus的static scope和Lisp的dynamic scope。 首先来看一个An Introduction ..." data-href="http://www.douban.com/note/269216547/" data-image="" data-properties="{&quot;href&quot;:&quot;http:\/\/www.douban.com\/people\/C6H5NO2\/&quot;,&quot;name&quot;:&quot;C6H5NO2&quot;,&quot;uid&quot;:&quot;3796992&quot;}" data-redir="http://www.douban.com/static/dshare_proxy.html" data-text="" data-apikey="" data-curl="" data-count="10" data-object_kind="1015" data-object_id="269216547" data-target_type="rec" data-target_action="0" data-action_props="{&quot;note_url&quot;:&quot;http:\/\/www.douban.com\/note\/269216547\/&quot;,&quot;note_title&quot;:&quot;关于R语言的scoping&quot;,&quot;author_name&quot;:&quot;C6H5NO2&quot;}" data-btn_text="推荐" data-heading="推荐到豆瓣" data-sanity_key="_8e1de" class="j a_show_login lnk-sharing lnk-douban-sharing">推荐</a>
+</span>
+        <span class="rec-num">2人</span>
+</div>
+
+            </div>
+
+            <div class="sns-bar-fav">
+                
+
+
+
+
+
+
+<span class="fav-num" data-tid="269216547" data-tkind="1015">
+      <a href="http://www.douban.com/note/269216547/?type=like#sep">2人</a>
+  喜欢
+</span>
+
+    <a class="fav-add btn-fav j a_show_login" title="标为喜欢？" href="http://www.douban.com/accounts/register?reason=like" data-tid="269216547" data-tkind="1015">喜欢</a>
+
+
+
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    </div>
+    <div class="clear"></div>
+
+    <div class="tabs" id="reviews">
+      <a href="http://www.douban.com/note/269216547/#sep" class="on">回应</a>
+      <a href="http://www.douban.com/note/269216547/?type=rec#sep">推荐</a>
+      <a href="http://www.douban.com/note/269216547/?type=like#sep">喜欢</a>
+    </div>
+
+    <div class="">
+          
+
+
+
+
+
+
+
+
+
+
+<div id="comments" class="">
+
+
+
+
+
+    
+
+<div class="comment-item" id="37687154" data-cid="37687154" data-target_id="269216547" data-target_kind="1015">
+    
+    <div class="pic">
+        <a href="http://www.douban.com/people/ancova/"><img class="" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/u2725951-1.jpg" alt="KENXIV" height="48" width="48"></a>
+    </div>
+    <div class="content report-comment">
+        <div class="author">
+            <span class="">2014-04-19 10:50:03</span>
+            <a href="http://www.douban.com/people/ancova/" class="  ">KENXIV</a>  (宁静淡泊的小镇)
+        </div>
+
+
+        
+        <p class="">S不太懂，好像是把所有都定义在Global environment里面了。
+<br>话说lexical scoping不就是static scoping么？</p>
+
+        <div class="op-lnks">
+        </div>
+
+        <div class="group_banned">
+            <span class="gact hidden p_u2725951 p_admin p_intern fright">&gt;
+                <a rel="nofollow" href="http://www.douban.com/note/269216547/remove_comment?cid=37687154" class="j a_confirm_link" title="删除KENXIV的发言?">删除</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="last"></div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    <br><span class="pl2" align="right"><a class="j a_show_login" href="https://www.douban.com/accounts/register?reason=comment">&gt; 我来回应</a></span>
+
+
+ 
+
+ 
+
+    
+    
+    
+
+
+
+
+
+
+
+
+</div>
+
+
+<script>
+Do(function(){
+  $('#comments').find('.comment-item').hover(function(){$(this).addClass('over');}, function(){$(this).removeClass('over');});
+  $('.reply-quote .toggle-reply').click(function(e) {
+    e.preventDefault();
+    var el = $(this);
+    el.prevAll('span').toggle();
+    el.find('span').toggle();
+  });
+});
+</script>
+
+
+
+
+    </div>
+
+
+
+    
+
+
+
+
+
+
+
+
+    
+<!-- douban ad begin -->
+<div id="dale_personal_note_bottom_super_banner"><iframe style="overflow: hidden; margin: 40px 0px 0px;" scrolling="no" id="dale_personal_note_bottom_super_banner_frame" frameborder="0" height="90" width="950"></iframe></div>
+<script type="text/javascript">
+    (function (global) {
+        var body = global.document.body,
+            html = global.document.documentElement;
+
+        var height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+        if (height >= 1000) {
+            (global.DoubanAdSlots = global.DoubanAdSlots || []).push('dale_personal_note_bottom_super_banner');
+        }
+    })(this);
+</script>
+<!-- douban ad end -->
+
+
+        </div>
+        <div class="aside">
+                
+    
+
+    
+
+
+
+
+
+    
+    <div class="mod">
+        
+        
+    <h2>
+        C6H5NO2的最新日记
+            &nbsp;·&nbsp;·&nbsp;·&nbsp;·&nbsp;·&nbsp;·
+            <span class="pl">&nbsp;(
+                
+                    <a href="http://www.douban.com/people/C6H5NO2/notes" target="_self">全部</a>
+                ) </span>
+    </h2>
+
+        
+        
+        <ul class="list note-list">
+              <li><a title="在visual studio 2013中编译lshkit 0.2.1" href="http://www.douban.com/note/335950556/">在visual studio 2013中编译lshkit 0.2.1</a>
+              </li><li><a title="让R在windows下开足马力进行计算" href="http://www.douban.com/note/296114898/">让R在windows下开足马力进行计算</a>
+              </li><li><a title="日记一则" href="http://www.douban.com/note/268034911/">日记一则</a>
+              </li><li><a title="用R进行整数规划" href="http://www.douban.com/note/264698278/">用R进行整数规划</a>
+              </li><li><a title="你的收入超过了多少人？——基尼系数的统计意义" href="http://www.douban.com/note/258838589/">你的收入超过了多少人？——基尼系数的统计意义</a>
+        </li></ul>
+    </div>
+
+    
+    <script>
+        $(document).ready(function(){
+            var tag_box = $('.author-tags'),
+                a_more_tag = tag_box.parent().find('h2 .pl'),
+                people_tags = $('.people_tags'),
+                people_tags_more = $('.people_tags_more')
+
+            a_more_tag.hide();
+
+            $('span', '.people_tags_more').each(function(i, tag) {
+                tag = $(tag)
+                tag.appendTo(people_tags)
+                if (people_tags.height() > 152) {
+                    people_tags_more.prepend(tag)
+                    a_more_tag.show()
+                    return false
+                }
+            })
+            tag_box.addClass('visible')
+            a_more_tag.click(function(e) {e.preventDefault();people_tags_more.show();a_more_tag.hide()});
+            $('#note_tooltip').tooltip();
+        })
+    </script>
+
+    
+
+
+
+    <!-- douban ad begin -->
+    <div id="dale_personal_note_middle_right" style="margin-bottom: 20px;"><iframe style="overflow: hidden; margin: 0px 0px 20px;" scrolling="no" id="dale_personal_note_middle_right_frame" frameborder="0" height="250" width="300"></iframe></div>
+    <!-- douban ad end -->
+
+<div class="mod">
+    
+
+</div>
+
+        </div>
+        <div class="extra">
+            
+
+        </div>
+    </div>
+</div>
+
+        
+<div id="footer">
+    
+
+<span id="icp" class="fleft gray-link">
+    © 2005－2014 douban.com, all rights reserved
+</span>
+
+<span class="fright">
+    <a href="http://www.douban.com/about">关于豆瓣</a>
+    · <a href="http://www.douban.com/jobs">在豆瓣工作</a>
+    · <a href="http://www.douban.com/about?topic=contactus">联系我们</a>
+    · <a href="http://www.douban.com/about?policy=disclaimer">免责声明</a>
+    
+    · <a href="http://www.douban.com/help/">帮助中心</a>
+    · <a href="http://developers.douban.com/" target="_blank">开发者</a>
+    · <a href="http://www.douban.com/mobile/">移动应用</a>
+    · <a href="http://www.douban.com/partner/">豆瓣广告</a>
+</span>
+
+
+</div>
+
+    </div>
+    <script type="text/javascript" src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/529c8492e26293cb.js"></script><div class="ui-overlay-mask" style="display: none;"><div class="ui-overlay-x"></div>                   <div class="ui-overlay-container">                   <a href="#" class="ui-overlay-close" style="">×</a>   <div class="hd"></div>                     <div class="bd"><iframe src="%E5%85%B3%E4%BA%8ER%E8%AF%AD%E8%A8%80%E7%9A%84scoping_files/popup_reg.html" scrolling="no" frameborder="0" height="300" width="400"></iframe></div>                   </div>                                     </div><script type="text/javascript">
+var douban_src = 'http://www.douban.com';
+var fav_type = 'fav_note';
+var fav_url = 'http://www.douban.com/note/269216547/?type=like#sep';
+</script>
+    
+    
+
+
+
+
+    
+<script type="text/javascript" data-mobile="true">
+    (function (global) {
+        var newNode = global.document.createElement('script'),
+            existingNode = global.document.getElementsByTagName('script')[0],
+            adSource = 'http://erebor.douban.com/',
+            userId = '',
+            browserId = '/YnDVWFiRQo',
+            ipAddress = '198.94.221.87',
+            criteria = '3:/note/269216547/',
+            preview = '',
+            debug = false,
+            adSlots = ['dale_personal_note_middle_right'];
+
+        global.DoubanAdRequest = {src: adSource, uid: userId, bid: browserId, ip: ipAddress, crtr: criteria, prv: preview, debug: debug};
+        global.DoubanAdSlots = (global.DoubanAdSlots || []).concat(adSlots);
+
+        newNode.setAttribute('type', 'text/javascript');
+        newNode.setAttribute('src', 'http://img3.douban.com/f/shire/55c9fe0e9ecb5725037e9839fc515504008dae74/js/ad.js');
+        newNode.setAttribute('async', true);
+        existingNode.parentNode.insertBefore(newNode, existingNode);
+    })(this);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-7019765-1']);
+_gaq.push(['_addOrganic', 'baidu', 'word']);
+_gaq.push(['_addOrganic', 'soso', 'w']);
+_gaq.push(['_addOrganic', '3721', 'name']);
+_gaq.push(['_addOrganic', 'youdao', 'q']);
+_gaq.push(['_addOrganic', 'so.360.cn', 'q']);
+_gaq.push(['_addOrganic', 'vnet', 'kw']);
+_gaq.push(['_addOrganic', 'sogou', 'query']);
+_gaq.push(['_addIgnoredOrganic', '豆瓣']);
+_gaq.push(['_addIgnoredOrganic', 'douban']);
+_gaq.push(['_addIgnoredOrganic', '豆瓣网']);
+_gaq.push(['_addIgnoredOrganic', 'www.douban.com']);
+_gaq.push(['_setDomainName', '.douban.com']);
+
+
+    _gaq.push(['_setCustomVar', 1, 'responsive_view_mode', 'desktop', 3]); 
+
+_gaq.push(['_trackPageview']);
+_gaq.push(['_trackPageLoadTime']);
+
+window._ga_init = function() {
+    var ga = document.createElement('script');
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    ga.setAttribute('async', 'true');
+    document.documentElement.firstChild.appendChild(ga);
+};
+if (window.addEventListener) {
+    window.addEventListener('load', _ga_init, false);
+} else {
+    window.attachEvent('onload', _ga_init);
+}
+</script>
+
+
+
+
+
+
+
+    <!-- dis20-->
+
+  <script>_SPLITTEST=''</script>
+
+<script>var _check_hijack = function () {
+    var _sig = "/YnDVWFi", _login = false, bid = get_cookie('bid');
+    if (location.protocol != "file:" && (
+            typeof(bid) != "string" && _login ||
+            typeof(bid) == "string" && bid.substring(0,8) != _sig)) {
+        location.href += (/\?/.test(location.href)?"&":"?") + (
+                "_r=" + Math.random().toString(16).substring(2));
+    }};
+if (typeof(Do) != 'undefined') Do(_check_hijack);
+else if (typeof(get_cookie) != 'undefined') _check_hijack();
+</script>
+
+
+
+</body></html>
